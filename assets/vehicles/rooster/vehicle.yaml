@@ -1,0 +1,8 @@
+# Vehicle definition file
+metadata:
+  name: "Rooster"
+  year: 2022
+  author: "UQRacing Formula SAE Team"
+  copyright: "Copyright (c) 2022 UQ Racing Formula SAE Team"
+
+dynamics:
