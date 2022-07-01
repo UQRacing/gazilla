@@ -1,9 +1,10 @@
-package com.uqracing.gazilla.utils
+package com.uqracing.gazilla.client.utils
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.resolvers.LocalFileHandleResolver
 import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import net.mgsx.gltf.loaders.glb.GLBAssetLoader
 import net.mgsx.gltf.loaders.gltf.GLTFAssetLoader
@@ -38,8 +39,8 @@ object Assets {
         assets.setLoader(SceneAsset::class.java, ".gltf", GLTFAssetLoader())
         assets.setLoader(SceneAsset::class.java, ".glb", GLBAssetLoader())
 
-        // load UI skin
         assets.load("assets/uiskin/cloud-form-ui.json", Skin::class.java)
+        assets.load("net/mgsx/gltf/shaders/brdfLUT.png", Texture::class.java)
 
         // load vehicle 3D models
         loadFromDir(assets, Gdx.files.internal("assets/vehicles"), SceneAsset::class.java)

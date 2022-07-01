@@ -1,4 +1,7 @@
-# Vehicle definition file
+# Vehicle definition file for Rooster
+# Copyright (c) 2022 Matt Young (UQRacing Formula SAE Team)
+# TODO MPL 2.0 header
+
 metadata:
   name: "Rooster"
   year: 2022
@@ -6,3 +9,5 @@ metadata:
   copyright: "Copyright (c) 2022 UQ Racing Formula SAE Team"
 
 dynamics:
+  # Class name of the vehicle dynamics model used
+  model: "DynamicBicycleModel"

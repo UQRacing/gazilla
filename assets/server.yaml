@@ -1,0 +1,17 @@
+# Gazilla server config file
+
+# General server configuration
+server:
+  # Update rate in Hz
+  updateRate: 60
+
+# Networking configuration
+network:
+  # Server communication port
+  port: 41803
+
+rosbridge:
+  # If the ROS bridge is enabled or not
+  enabled: true
+  # ROS bridge communication port
+  port: 41802

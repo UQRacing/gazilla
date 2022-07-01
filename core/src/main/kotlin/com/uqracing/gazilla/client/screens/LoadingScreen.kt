@@ -1,4 +1,4 @@
-package com.uqracing.gazilla.screens
+package com.uqracing.gazilla.client.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
@@ -6,19 +6,17 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Container
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
-import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.Window
 import com.badlogic.gdx.utils.Align
-import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.badlogic.gdx.utils.viewport.ScreenViewport
-import com.uqracing.gazilla.Gazilla
-import com.uqracing.gazilla.utils.ASSETS
-import com.uqracing.gazilla.utils.Assets
+import com.uqracing.gazilla.client.GazillaClient
+import com.uqracing.gazilla.client.utils.ASSETS
+import com.uqracing.gazilla.client.utils.Assets
 import ktx.app.clearScreen
 import org.tinylog.kotlin.Logger
 import kotlin.math.roundToInt
 
-class LoadingScreen(private val game: Gazilla) : Screen {
+class LoadingScreen(private val game: GazillaClient) : Screen {
     private lateinit var skin: Skin
     private lateinit var stage: Stage
     private lateinit var label: Label
@@ -55,6 +53,10 @@ class LoadingScreen(private val game: Gazilla) : Screen {
         if (ASSETS.update()) {
             // finished loading assets
             Logger.debug("Finished loading assets")
+            label.setText("Initialising renderer...")
+            // make sure the text gets updated
+            stage.act(delta)
+            stage.draw()
             game.screen = SimulationScreen()
         } else {
             // not yet done
