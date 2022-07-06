@@ -7,10 +7,9 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.math.Plane
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
 import com.badlogic.gdx.utils.viewport.ExtendViewport
@@ -19,14 +18,12 @@ import ktx.app.clearScreen
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
 import net.mgsx.gltf.scene3d.lights.DirectionalLightEx
-import net.mgsx.gltf.scene3d.lights.PointLightEx
 import net.mgsx.gltf.scene3d.scene.Scene
 import net.mgsx.gltf.scene3d.scene.SceneAsset
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.scene.SceneSkybox
 import net.mgsx.gltf.scene3d.utils.IBLBuilder
 import kotlin.random.Random
-
 
 class SimulationScreen : Screen {
     private val multiplexer = InputMultiplexer()
@@ -38,27 +35,32 @@ class SimulationScreen : Screen {
         scrollFactor = -0.01f
     }
     private val manager = SceneManager()
-    private lateinit var scene: Scene
     private val shapeRender = ShapeRenderer()
     private var bbox = BoundingBox()
+    private lateinit var wheelScene: Scene
 
     override fun show() {
         camera.fieldOfView = 75f
         camera.near = 0.01f
         camera.far = 50f
 
-        // TODO all temporary!
+        // TODO all temporary! we need to load car name, etc, from YAML (or cmd line)
         // source: https://github.com/mgsx-dev/gdx-gltf/blob/master/demo/core/src/net/mgsx/gltf/examples/GLTFQuickStartExample.java
 
-        val asset = ASSETS.get("assets/vehicles/rooster/whole_car.glb", SceneAsset::class.java)
-        scene = Scene(asset.scene)
-        manager.addScene(scene)
+        val vehicle = ASSETS["assets/vehicles/rooster/whole_car.glb", SceneAsset::class.java]
+        val wheel = ASSETS["assets/vehicles/rooster/wheel.glb", SceneAsset::class.java]
+        val vehicleScene = Scene(vehicle.scene)
+        wheelScene = Scene(wheel.scene)
+
+        manager.addScene(vehicleScene)
+        manager.addScene(wheelScene)
         manager.setCamera(camera)
 
         // setup camera
-        scene.modelInstance.calculateBoundingBox(bbox)
+        vehicleScene.modelInstance.calculateBoundingBox(bbox)
         val carCentre = Vector3(bbox.centerX, bbox.centerY, bbox.centerZ)
         cameraController.target = carCentre
+        cameraController.autoUpdate = false
         camera.lookAt(carCentre)
         cameraController.zoom(-2f)
         camera.rotateAround(carCentre, Vector3(0f, 0f, 1f), 90f)
@@ -95,13 +97,23 @@ class SimulationScreen : Screen {
         Gdx.input.inputProcessor = multiplexer
     }
 
+    var target = Vector3()
+    var progress = 0.0f
+
     override fun render(delta: Float) {
         clearScreen(0.0f, 0.0f, 0.0f, 1.0f)
         // update
         val carCentre = Vector3(bbox.centerX, bbox.centerY, bbox.centerZ)
-//        camera.rotateAround(carCentre, Vector3(0f, 0f, 1f), delta * 2f)
-//        camera.normalizeUp()
-//        camera.update()
+        val baseLink = Vector3(bbox.centerX, 0f, bbox.centerZ)
+        val frontLeft = baseLink.cpy().add(0.8109f, 0.475f, 0.230f)
+        // TODO draw bounding box around car
+
+        cameraController.update()
+        // TODO clamp camera angle so it doesn't go around
+        camera.update()
+
+        wheelScene.modelInstance.transform.rotate(Vector3(0f, 0f, 1f), delta * -1000f)
+        wheelScene.modelInstance.calculateTransforms()
 
         // render
         manager.update(delta)
@@ -109,14 +121,12 @@ class SimulationScreen : Screen {
 
         shapeRender.color = Color.RED
         shapeRender.begin(ShapeRenderer.ShapeType.Filled)
-        val carScreen = camera.project(carCentre.cpy())
-        shapeRender.circle(carScreen.x, carScreen.y, 8f)
+        val baseLinkScreen = camera.project(baseLink.cpy())
+        shapeRender.circle(baseLinkScreen.x, baseLinkScreen.y, 8f)
+        val frontLeftScreen = camera.project(frontLeft.cpy())
+        shapeRender.circle(frontLeftScreen.x, frontLeftScreen.y, 8f)
 
-        val minScreen = camera.project(bbox.min.cpy())
-        val maxScreen = camera.project(bbox.max.cpy())
-        shapeRender.circle(minScreen.x, minScreen.y, 8f)
-        shapeRender.circle(maxScreen.x, maxScreen.y, 8f)
-        // TODO draw bounding box
+        // TODO draw bounding box for car (wireframe style)
         shapeRender.end()
 
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {

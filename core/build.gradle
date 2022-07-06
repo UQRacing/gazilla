@@ -24,4 +24,6 @@ dependencies {
 	api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
 	api 'org.tinylog:tinylog-api-kotlin:2.4.1'
 	api 'org.tinylog:tinylog-impl:2.4.1'
+	api 'org.zeromq:jeromq:0.5.2'
+	api 'com.esotericsoftware.yamlbeans:yamlbeans:1.15'
 }

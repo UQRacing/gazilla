@@ -5,9 +5,15 @@ mainClassName = 'com.uqracing.gazilla.headless.HeadlessLauncher'
 eclipse.project.name = appName + '-headless'
 
 dependencies {
+    api 'com.esotericsoftware.yamlbeans:yamlbeans:1.15'
     implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     implementation project(':core')
+}
+
+run {
+    workingDir = rootProject.file('assets').path
+    setIgnoreExitValue(true)
 }
 
 jar {
