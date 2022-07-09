@@ -6,7 +6,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.uqracing.gazilla.common
+package com.uqracing.gazilla.common.network
+
+import com.uqracing.gazilla.common.TransformComponent
 
 /**
  * Class for an entity that has been ripped out of the server's Ashley instance, will be serialised,

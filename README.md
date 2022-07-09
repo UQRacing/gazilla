@@ -75,3 +75,4 @@ The 3D model of UQRacing's 2022 AV, Rooster, is released under the CC-BY-SA 4.0 
 - libGDX, the excellent Java game library
 - gdx-gltf by mgsx, a fantastic GLTF 2.0 loading and PBR rendering library for libGDX
 - Kryo, the fast serialisation framework
+- JeroMQ, a Java implementation of the ZeroMQ socket protocol

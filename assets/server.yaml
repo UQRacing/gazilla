@@ -1,9 +1,12 @@
-# Gazilla server config file
+# Gazilla server config file. You can edit these values to change how the server behaves.
 
 # General server configuration
 server:
   # Update rate in Hz
   updateRate: 60
+
+  # Full path of track to load and simulate
+  trackFile: "assets/tracks/FSG_trackdrive.yaml"
 
 # Networking configuration
 network:
@@ -13,7 +16,6 @@ network:
 rosbridge:
   # If the ROS bridge is enabled or not
   enabled: true
-  # ROS host (usually localhost)
-  host: "127.0.0.1"
+
   # ROS port
   port: 41802

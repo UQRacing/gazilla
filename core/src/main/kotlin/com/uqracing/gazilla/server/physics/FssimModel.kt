@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2022 Matt Young (UQ Racing Formula SAE Team).
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package com.uqracing.gazilla.server.physics
 
 import com.badlogic.ashley.core.Engine
@@ -43,8 +51,6 @@ private data class FssimState (
     val a_y: Double = 0.0,
     val a_theta: Double = 0.0,
 )
-
-// TODO should these models actually be Ashley Systems?
 
 /**
  * Vehicle model ported from fssim, under fssim/fssim_gazebo_plugins/fssim_gazebo_racecar

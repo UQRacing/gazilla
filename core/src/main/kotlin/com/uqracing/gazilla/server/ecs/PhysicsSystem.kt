@@ -9,21 +9,19 @@
 package com.uqracing.gazilla.server.ecs
 
 import com.badlogic.ashley.core.ComponentMapper
+import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.ashley.core.Family
-import com.uqracing.gazilla.server.utils.PhysicsComponent
+import com.badlogic.ashley.systems.IteratingSystem
 
 /**
  * This system updates the vehicle model for all vehicles in the world
  */
-class PhysicsSystem : EntitySystem() {
-    private val vehicles = Family.one(PhysicsComponent::class.java).get()
+class PhysicsSystem : IteratingSystem(Family.one(PhysicsComponent::class.java).get()) {
     private val pm = ComponentMapper.getFor(PhysicsComponent::class.java)
 
-    override fun update(deltaTime: Float) {
-        val vehicles = engine.getEntitiesFor(vehicles)
-        for (vehicle in vehicles) {
-            pm.get(vehicle).model.update(deltaTime.toDouble(), engine)
-        }
+    override fun processEntity(entity: Entity, deltaTime: Float) {
+        // update vehicle physics
+        pm.get(entity).model.update(deltaTime.toDouble(), engine)
     }
 }

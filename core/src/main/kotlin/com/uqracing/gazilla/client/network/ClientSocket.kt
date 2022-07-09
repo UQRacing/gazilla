@@ -6,10 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.uqracing.gazilla.server.network
+package com.uqracing.gazilla.client.network
 
-/**
- * Socket for interacting with the ROS bridge
- */
-class ROSBridgeSocket : Thread() {
+class ClientSocket(port: Int) {
 }

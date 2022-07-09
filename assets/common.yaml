@@ -1,0 +1,7 @@
+# Shared client-server configuration
+
+# Name of the vehicle to be loaded and simulated
+vehicle: "rooster"
+
+# Path of the track file to load
+trackFile: "assets/tracks/FSG_trackdrive.yaml"

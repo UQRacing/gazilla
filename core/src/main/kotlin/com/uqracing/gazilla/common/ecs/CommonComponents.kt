@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2022 Matt Young (UQ Racing Formula SAE Team).
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package com.uqracing.gazilla.common
 
 import com.badlogic.ashley.core.Component
@@ -25,7 +33,9 @@ data class TransformComponent(
 }
 
 /**
- * Indicator component for entities that should be transported over the network, i.e. those
- * entities which will be serialised
+ * Represents each entity's type in the simulation, so they can be identified in the sim and
+ * over the network.
  */
-class TransportIndicatorComponent : Component
+data class EntityTypeComponent(
+    val type: EntityType = EntityType.UNKNOWN
+) : Component, java.io.Serializable

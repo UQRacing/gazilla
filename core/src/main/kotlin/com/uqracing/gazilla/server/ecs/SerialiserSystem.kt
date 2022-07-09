@@ -11,28 +11,27 @@ package com.uqracing.gazilla.server.ecs
 import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.ashley.core.Family
-import com.uqracing.gazilla.common.NetworkEntity
+import com.esotericsoftware.kryo.io.Output
+import com.uqracing.gazilla.common.KRYO
+import com.uqracing.gazilla.common.network.NetworkEntity
 import com.uqracing.gazilla.common.TransformComponent
-import com.uqracing.gazilla.common.TransportIndicatorComponent
-import java.io.ByteArrayOutputStream
-import java.io.ObjectOutputStream
 
 /**
  * Ashley system which serialises the relevant parts of each entity for transmission over
  * network.
  *
  * SerialiserSystem **MUST** be the last system to be updated.
- *
- * TODO use Kryo instead of ObjectOutputStream
  */
 class SerialiserSystem : EntitySystem() {
-    private val stream = ByteArrayOutputStream(512)
-    private val writer = ObjectOutputStream(stream)
+    private val output = Output(1024)
     private val transportFamily = Family.one(TransportIndicatorComponent::class.java).get()
     private val tm = ComponentMapper.getFor(TransformComponent::class.java)
 
-    /** Serialised list of entities, since the last call to [update], suitable for network transfer */
-    var output = ByteArray(1)
+    /**
+    * Serialised list of entities, since the last call to [update].
+    * This is all the data that the client needs, so can be sent straight over network.
+    */
+    var data = ByteArray(1)
 
     override fun update(deltaTime: Float) {
         val entities = engine.getEntitiesFor(transportFamily)
@@ -47,11 +46,9 @@ class SerialiserSystem : EntitySystem() {
         }
 
         // serialise the list of entities and store it in the output buffer
-        stream.reset()
-        writer.reset()
-        writer.writeObject(networkEntities)
-        output = stream.toByteArray()
+        output.reset()
+        KRYO.writeObject(output, networkEntities)
+        output.flush()
+        data = output.toBytes()
     }
-
-
 }

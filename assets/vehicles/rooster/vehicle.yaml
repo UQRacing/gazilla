@@ -1,6 +1,9 @@
-# Vehicle definition file for Rooster
-# Copyright (c) 2022 Matt Young (UQRacing Formula SAE Team)
-# TODO MPL 2.0 header
+# Vehicle definition file for UQRacing's 2022 AV, Rooster.
+# Copyright (c) 2022 Matt Young (UQ Racing Formula SAE Team).
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 metadata:
   name: "Rooster"
@@ -11,6 +14,7 @@ metadata:
 dynamics:
   # Change the below line to the class of the vehicle model being used and configured.
   !com.uqracing.gazilla.server.utils.FssimModelConfig
+  # Config options for the above vehicle model follow.
 
-  # Config options for the above vehicle model follow here.
+  # Vehicle mass in kg
   mass: 206.0
