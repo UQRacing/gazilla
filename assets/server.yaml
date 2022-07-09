@@ -5,9 +5,6 @@ server:
   # Update rate in Hz
   updateRate: 60
 
-  # Full path of track to load and simulate
-  trackFile: "assets/tracks/FSG_trackdrive.yaml"
-
 # Networking configuration
 network:
   # Server communication port

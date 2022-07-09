@@ -10,7 +10,6 @@ package com.uqracing.gazilla.server.utils
 
 data class ServerGeneralConfig(
     var updateRate: Int = 0,
-    var trackFile: String = "",
 )
 
 data class ServerNetworkConfig(

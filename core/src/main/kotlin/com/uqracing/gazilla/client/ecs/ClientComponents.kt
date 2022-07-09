@@ -6,10 +6,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.uqracing.gazilla.client.utils
+package com.uqracing.gazilla.client.ecs
 
-/**
- * Version history:
- * v0.0.1: initial development version
- */
-const val CLIENT_VERSION = "0.0.1"
+// TODO model component, etc should go here

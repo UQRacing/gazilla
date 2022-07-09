@@ -10,6 +10,7 @@ package com.uqracing.gazilla.client.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Container
 import com.badlogic.gdx.scenes.scene2d.ui.Label
@@ -24,7 +25,7 @@ import ktx.app.clearScreen
 import org.tinylog.kotlin.Logger
 import kotlin.math.roundToInt
 
-class LoadingScreen(private val game: GazillaClient) : Screen {
+class LoadingScreen(private val game: GazillaClient) : ScreenAdapter() {
     private lateinit var skin: Skin
     private lateinit var stage: Stage
     private lateinit var label: Label
@@ -49,7 +50,6 @@ class LoadingScreen(private val game: GazillaClient) : Screen {
 
         stage.addActor(container)
 
-        Logger.debug("Loading assets")
         Assets.load(ASSETS)
     }
 
@@ -75,15 +75,6 @@ class LoadingScreen(private val game: GazillaClient) : Screen {
 
     override fun resize(width: Int, height: Int) {
         stage.viewport.update(width, height, true)
-    }
-
-    override fun pause() {
-    }
-
-    override fun resume() {
-    }
-
-    override fun hide() {
     }
 
     override fun dispose() {

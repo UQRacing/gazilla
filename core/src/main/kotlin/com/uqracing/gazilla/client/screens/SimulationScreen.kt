@@ -8,10 +8,12 @@
 
 package com.uqracing.gazilla.client.screens
 
+import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.graphics.Texture
@@ -21,7 +23,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
 import com.badlogic.gdx.utils.viewport.ExtendViewport
+import com.esotericsoftware.yamlbeans.YamlReader
 import com.uqracing.gazilla.client.utils.ASSETS
+import com.uqracing.gazilla.common.utils.COMMON_CONFIG
+import com.uqracing.gazilla.common.utils.CommonConfig
+import com.uqracing.gazilla.server.utils.SERVER_CONFIG
+import com.uqracing.gazilla.server.utils.ServerConfig
 import ktx.app.clearScreen
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
@@ -31,12 +38,13 @@ import net.mgsx.gltf.scene3d.scene.SceneAsset
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.scene.SceneSkybox
 import net.mgsx.gltf.scene3d.utils.IBLBuilder
+import org.tinylog.kotlin.Logger
 import kotlin.random.Random
 
 /**
  * Main class for the graphical simulation on the client
  */
-class SimulationScreen : Screen {
+class SimulationScreen : ScreenAdapter() {
     private val multiplexer = InputMultiplexer()
     private val camera = PerspectiveCamera()
     private val viewport = ExtendViewport(1600f, 900f, camera)
@@ -49,13 +57,38 @@ class SimulationScreen : Screen {
     private val shapeRender = ShapeRenderer()
     private var bbox = BoundingBox()
     private lateinit var wheelScene: Scene
+    private val engine = Engine()
+
+    private fun loadConfig() {
+        Logger.debug("Loading config")
+        // load client config YAML
+        // TODO implement this once client YAML is more well defined
+
+        // load shared config
+        val commonConfigFile = Gdx.files.local("assets/common.yaml")
+        COMMON_CONFIG = YamlReader(commonConfigFile.readString()).read(CommonConfig::class.java)
+        Logger.debug(COMMON_CONFIG)
+    }
+
+    private fun initialiseEcs() {
+        Logger.debug("Initialising world")
+    }
+
+    private fun initialiseTrack() {
+        Logger.debug("Initialising track")
+    }
 
     override fun show() {
+        loadConfig()
+        initialiseEcs()
+        initialiseTrack()
+
         camera.fieldOfView = 75f
         camera.near = 0.01f
         camera.far = 50f
 
         // TODO all temporary! we need to load car name, etc, from YAML (or cmd line)
+        //  also move this into an initialiseRenderer function
         // source: https://github.com/mgsx-dev/gdx-gltf/blob/master/demo/core/src/net/mgsx/gltf/examples/GLTFQuickStartExample.java
 
         val vehicle = ASSETS["assets/vehicles/rooster/whole_car.glb", SceneAsset::class.java]
@@ -108,9 +141,6 @@ class SimulationScreen : Screen {
         Gdx.input.inputProcessor = multiplexer
     }
 
-    var target = Vector3()
-    var progress = 0.0f
-
     override fun render(delta: Float) {
         clearScreen(0.0f, 0.0f, 0.0f, 1.0f)
         // update
@@ -148,15 +178,6 @@ class SimulationScreen : Screen {
     override fun resize(width: Int, height: Int) {
         viewport.update(width, height)
         manager.updateViewport(width.toFloat(), height.toFloat())
-    }
-
-    override fun pause() {
-    }
-
-    override fun resume() {
-    }
-
-    override fun hide() {
     }
 
     override fun dispose() {

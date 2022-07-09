@@ -6,7 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.uqracing.gazilla.common
+package com.uqracing.gazilla.common.utils
 
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Quaternion
@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryo.util.ListReferenceResolver
+import com.uqracing.gazilla.common.ecs.TransformComponent
 import com.uqracing.gazilla.common.network.NetworkEntity
 
 /**
@@ -41,3 +42,8 @@ enum class EntityType {
     /** Yellow cone (right) */
     CONE_YELLOW,
 }
+
+/**
+ * Instance of common config, shared between client and server code
+ */
+var COMMON_CONFIG = CommonConfig()

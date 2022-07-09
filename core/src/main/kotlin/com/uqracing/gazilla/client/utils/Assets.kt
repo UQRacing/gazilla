@@ -19,11 +19,6 @@ import net.mgsx.gltf.loaders.gltf.GLTFAssetLoader
 import net.mgsx.gltf.scene3d.scene.SceneAsset
 import org.tinylog.kotlin.Logger
 
-/**
- * Global shared assets resource
- */
-val ASSETS = AssetManager(LocalFileHandleResolver())
-
 object Assets {
     private val allowedExtensions = listOf("glb", "atlas", "png", "jpg", "fnt")
 

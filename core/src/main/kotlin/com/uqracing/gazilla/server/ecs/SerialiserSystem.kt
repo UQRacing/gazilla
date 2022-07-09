@@ -12,9 +12,9 @@ import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.ashley.core.Family
 import com.esotericsoftware.kryo.io.Output
-import com.uqracing.gazilla.common.KRYO
 import com.uqracing.gazilla.common.network.NetworkEntity
-import com.uqracing.gazilla.common.TransformComponent
+import com.uqracing.gazilla.common.ecs.TransformComponent
+import com.uqracing.gazilla.common.utils.KRYO
 
 /**
  * Ashley system which serialises the relevant parts of each entity for transmission over

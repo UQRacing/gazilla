@@ -8,7 +8,7 @@
 
 package com.uqracing.gazilla.common.network
 
-import com.uqracing.gazilla.common.TransformComponent
+import com.uqracing.gazilla.common.ecs.TransformComponent
 
 /**
  * Class for an entity that has been ripped out of the server's Ashley instance, will be serialised,

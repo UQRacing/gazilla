@@ -6,13 +6,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.uqracing.gazilla.common
+package com.uqracing.gazilla.common.ecs
 
 import com.badlogic.ashley.core.Component
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.math.Vector3
+import com.uqracing.gazilla.common.utils.EntityType
 
 // Components common to client and server (typically things that are sent across the network)
 
