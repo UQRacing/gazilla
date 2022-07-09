@@ -6,8 +6,11 @@ metadata:
   name: "Rooster"
   year: 2022
   author: "UQRacing Formula SAE Team"
-  copyright: "Copyright (c) 2022 UQ Racing Formula SAE Team"
+  copyright: "Copyright (c) 2022 UQRacing Formula SAE Team. See vehicles/rooster/LICENCE.txt."
 
 dynamics:
-  # Class name of the vehicle dynamics model used
-  model: "DynamicBicycleModel"
+  # Change the below line to the class of the vehicle model being used and configured.
+  !com.uqracing.gazilla.server.utils.FssimModelConfig
+
+  # Config options for the above vehicle model follow here.
+  mass: 206.0

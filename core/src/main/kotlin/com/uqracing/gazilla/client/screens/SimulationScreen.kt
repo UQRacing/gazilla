@@ -25,6 +25,9 @@ import net.mgsx.gltf.scene3d.scene.SceneSkybox
 import net.mgsx.gltf.scene3d.utils.IBLBuilder
 import kotlin.random.Random
 
+/**
+ * Main class for the graphical simulation on the client
+ */
 class SimulationScreen : Screen {
     private val multiplexer = InputMultiplexer()
     private val camera = PerspectiveCamera()

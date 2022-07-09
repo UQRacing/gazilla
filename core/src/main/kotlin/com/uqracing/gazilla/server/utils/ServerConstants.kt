@@ -1,5 +1,7 @@
 package com.uqracing.gazilla.server.utils
 
+import com.esotericsoftware.kryo.Kryo
+
 /**
  * Version history:
  * v0.0.1: initial version

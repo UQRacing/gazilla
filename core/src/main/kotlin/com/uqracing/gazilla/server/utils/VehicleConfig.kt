@@ -7,15 +7,22 @@ data class VehicleConfigMetadata(
     var copyright: String = "",
 )
 
-/**
- * Part of vehhicle configuration that is deserialised from YAML, this is the VD part
- */
-data class DynamicsConfig(var model: String = "")
+/** Generic interface for all vehicle configuration */
+interface VDConfig
+
+/** Required for a default instance of VDConfig in the VehicleConfig class */
+class NullModelConfig : VDConfig
+
+/** Configuration for [com.uqracing.gazilla.server.physics.FssimModel] */
+data class FssimModelConfig(
+    var mass: Float = 0.0f,
+) : VDConfig
 
 /**
  * Vehicle config JavaBeans that is deserialised from YAML
  */
 data class VehicleConfig(
     var metadata: VehicleConfigMetadata = VehicleConfigMetadata(),
-    var dynamics: DynamicsConfig = DynamicsConfig()
+    // pass the generic VDConfig interface here, we can use
+    var dynamics: VDConfig = NullModelConfig(),
 )

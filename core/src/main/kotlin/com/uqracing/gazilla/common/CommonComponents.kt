@@ -11,19 +11,21 @@ import com.badlogic.gdx.math.Vector3
 /**
  * Represents a 3D transformation of a model
  */
-class TransformComponent : Component {
-    val position = Vector3()
-    val orientation = Quaternion()
-    @Transient val transform = Matrix4()
-
+data class TransformComponent(
+    val position: Vector3 = Vector3(),
+    val orientation: Quaternion = Quaternion(),
+    @Transient val transform: Matrix4 = Matrix4(),
+) : Component, java.io.Serializable {
+    /**
+     * Calculates the transform matrix in place from the class' position and orientation
+     */
     fun calculateTransformMatrix() {
         transform.set(position, orientation)
     }
 }
 
 /**
- * Component which holds a reference to a mgsx gltf ModelInstance
+ * Indicator component for entities that should be transported over the network, i.e. those
+ * entities which will be serialised
  */
-class ModelComponent : Component {
-    lateinit var instance: ModelInstance
-}
+class TransportIndicatorComponent : Component
