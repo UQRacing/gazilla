@@ -23,6 +23,7 @@ fun main() {
         setTitle("Gazilla Client")
         setMaximized(true)
         setWindowedMode(1600, 900)
-        setWindowIcon(*(arrayOf(128, 64, 32, 16).map { "libgdx$it.png" }.toTypedArray()))
+        // FIXME it's low res in the alt tab menu
+        setWindowIcon(*(arrayOf(512, 128, 64, 32, 16).map { "gazilla$it.png" }.toTypedArray()))
     })
 }

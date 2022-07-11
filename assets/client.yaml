@@ -1,3 +1,5 @@
 # General client configuration
 
-# TODO graphics options (for weaker computers)
+# Enable FXAA, a fast but kinda ugly-looking anti-aliasing technique. Disable if you don't like it, or it slows down
+# the renderer too much.
+fxaa: true

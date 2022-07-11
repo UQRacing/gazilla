@@ -9,7 +9,10 @@
 package com.uqracing.gazilla.client
 
 import com.badlogic.gdx.Game
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Version
 import com.uqracing.gazilla.client.screens.LoadingScreen
+import com.uqracing.gazilla.client.screens.ProceduralExamples
 import com.uqracing.gazilla.client.utils.CLIENT_VERSION
 import org.tinylog.kotlin.Logger
 
@@ -17,6 +20,8 @@ import org.tinylog.kotlin.Logger
 class GazillaClient : Game() {
     override fun create() {
         Logger.info("Gazilla Client v$CLIENT_VERSION - Matt Young, 2022, UQRacing")
+        Logger.info("Using libGDX v${Version.VERSION}")
         setScreen(LoadingScreen(this))
+//        setScreen(ProceduralExamples())
     }
 }

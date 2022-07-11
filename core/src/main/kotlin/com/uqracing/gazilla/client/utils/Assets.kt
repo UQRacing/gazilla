@@ -47,5 +47,7 @@ object Assets {
 
         // load vehicle 3D models
         loadFromDir(assets, Gdx.files.internal("assets/vehicles"), SceneAsset::class.java)
+        // load background cubemap, currently only using background_miramar
+        loadFromDir(assets, Gdx.files.internal("assets/environment/background_miramar/"), Texture::class.java)
     }
 }

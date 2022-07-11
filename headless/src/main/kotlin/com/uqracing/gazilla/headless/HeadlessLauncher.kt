@@ -12,7 +12,6 @@ package com.uqracing.gazilla.headless
 
 import com.badlogic.gdx.backends.headless.HeadlessApplication
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration
-import com.uqracing.gazilla.client.GazillaClient
 import com.uqracing.gazilla.server.GazillaServer
 import org.tinylog.kotlin.Logger
 
@@ -29,4 +28,6 @@ fun main(args: Array<String>) {
     HeadlessApplication(GazillaServer(vehicleName), HeadlessApplicationConfiguration().apply {
         updatesPerSecond = 60
     })
+    // TODO start an Swing/JavaFX window in the background with the gazilla icon that just says "Server is running"
+    //  and can be used to quit the server
 }

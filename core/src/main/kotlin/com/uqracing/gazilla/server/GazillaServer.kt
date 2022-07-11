@@ -67,11 +67,12 @@ class GazillaServer(private val vehicleName: String) : ApplicationAdapter() {
         val track = YamlReader(trackFile.readString()).read(Track::class.java)
 
         // add cones based on track data
+//        println("x,y")
         for (blueCone in track.cones_left) {
-
+//            println("${blueCone[0]},${blueCone[1]}")
         }
         for (yellowCone in track.cones_right) {
-
+//            println("${yellowCone[0]},${yellowCone[1]}")
         }
     }
 
