@@ -1,5 +1,8 @@
-# General client configuration
+# General client configuration, used to adjust graphics settings.
 
-# Enable FXAA, a fast but kinda ugly-looking anti-aliasing technique. Disable if you don't like it, or it slows down
-# the renderer too much.
-fxaa: true
+# Number of MSAA anti-aliasing samples to take. Higher values improve the look of the renderer, but decrease performance
+# quite a lot.
+msaaSamples: 8
+
+# Distance of the camera's far clip plane. Reducing this may improve performance, as more objects can be culled.
+farClipDist: 75.0

@@ -46,7 +46,9 @@ Hints:
 
 - A good way to convert image file formats is with ImageMagick: `mogrify -format tga cubemap.jpg` converts cubemap.jpg
 to cubemap.tga. BE WARNED: JPEG to TGA seems to flip the image? Use GIMP to unflip it.
+- pmrem files/radiance map are colour; iem/irradiance files are somewhat greyscale looking
 - Avoid doing this lol it's really annoying.
+
 
 ## Additional notes
 The 3D assets for _all_ vehicles will be automatically loaded by the Gazilla client on launch,

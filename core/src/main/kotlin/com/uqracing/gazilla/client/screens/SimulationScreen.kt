@@ -14,16 +14,18 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
-import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.ExtendViewport
+import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.crashinvaders.vfx.VfxManager
 import com.crashinvaders.vfx.effects.FxaaEffect
 import com.esotericsoftware.yamlbeans.YamlReader
@@ -32,6 +34,8 @@ import com.uqracing.gazilla.common.Track
 import com.uqracing.gazilla.common.utils.COMMON_CONFIG
 import com.uqracing.gazilla.common.utils.CommonConfig
 import ktx.app.clearScreen
+import ktx.assets.DisposableContainer
+import ktx.assets.disposeSafely
 import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
@@ -52,7 +56,7 @@ class SimulationScreen : ScreenAdapter() {
     private val camera = PerspectiveCamera().apply {
         fieldOfView = 75f
         near = 0.01f
-        far = 50f
+        far = 75f
     }
     private val cameraController = CameraInputController(camera).apply {
         translateButton = Input.Buttons.MIDDLE
@@ -63,18 +67,18 @@ class SimulationScreen : ScreenAdapter() {
     private val manager = SceneManager(0)
     private val shapeRender = ShapeRenderer()
     private lateinit var wheelScene: Scene
-    private lateinit var environmentCubemap: Cubemap
-    private lateinit var diffuseCubemap: Cubemap
-    private lateinit var specularCubemap: Cubemap
     private val engine = Engine()
     private lateinit var vfx: VfxManager
-    private lateinit var fxaaEffect: FxaaEffect
-    private lateinit var cubeModel: ModelInstance
+//    private lateinit var fxaaEffect: FxaaEffect
+    private val disposables = DisposableContainer()
+    private val stage = Stage(ScreenViewport())
+    private val batch = SpriteBatch()
+    private lateinit var bmfont: BitmapFont
 
     private fun loadConfig() {
         Logger.debug("Loading config")
-        // load client config YAML
-        // TODO implement this once client YAML is more well defined
+        // client config YAML is already loaded
+        // TODO load vehicle config
 
         // load shared config
         val commonConfigFile = Gdx.files.local("assets/common.yaml")
@@ -108,6 +112,8 @@ class SimulationScreen : ScreenAdapter() {
         val wheel = ASSETS["assets/vehicles/rooster/wheel.glb", SceneAsset::class.java]
         val vehicleScene = Scene(vehicle.scene)
         wheelScene = Scene(wheel.scene)
+        wheelScene.modelInstance.transform.translate(0f, 0.2f, 0.4f)
+        wheelScene.modelInstance.calculateTransforms()
 
         manager.addScene(vehicleScene)
         manager.addScene(wheelScene)
@@ -125,16 +131,21 @@ class SimulationScreen : ScreenAdapter() {
 
         // setup the sun light
         val light = DirectionalLightEx()
+        // TODO make GUI to customise light (and align it with the sun)
         light.direction.set(1f, -3f, 1f).nor()
+        light.intensity = 8f
         light.color.set(Color.WHITE)
         manager.environment.add(light)
 
         // setup quick IBL (image based lighting)
-        val iblBuilder = IBLBuilder.createOutdoor(light)
-        environmentCubemap = makeCubemap()
-        diffuseCubemap = iblBuilder.buildIrradianceMap(256)
-        specularCubemap = iblBuilder.buildRadianceMap(10)
+        val iblBuilder = IBLBuilder.createCustom(light)
+        val environmentCubemap = makeCubemap("assets/environment/background", "jpg")
+        val diffuseCubemap = makeCubemap("assets/environment/irradiance", "png") // iradiance
+        val specularCubemap = makeCubemap("assets/environment/radiance", "png") // radiance
         iblBuilder.dispose()
+        disposables.register(environmentCubemap)
+        disposables.register(diffuseCubemap)
+        disposables.register(specularCubemap)
 
         // This texture is provided by the library, no need to have it in your assets.
         val brdfLut = ASSETS["net/mgsx/gltf/shaders/brdfLUT.png", Texture::class.java]
@@ -146,14 +157,21 @@ class SimulationScreen : ScreenAdapter() {
 
         // setup skybox
         val skybox = SceneSkybox(environmentCubemap)
-        manager.setSkyBox(skybox)
+        manager.skyBox = skybox
 
         // setup post-processing
         vfx = VfxManager(Pixmap.Format.RGBA8888)
-        fxaaEffect = FxaaEffect()
-        vfx.addEffect(fxaaEffect)
+//        fxaaEffect = FxaaEffect()
+//        vfx.addEffect(fxaaEffect)
 
-        val builder = ModelBuilder()
+        // create ground plane thing
+        val modelBuilder = ModelBuilder()
+        val material = Material()
+        material.set(PBRColorAttribute.createBaseColorFactor(Color(Color.WHITE)))
+        val attribs = VertexAttributes.Usage.Position.toLong() or VertexAttributes.Usage.Normal.toLong()
+        val model = modelBuilder.createLineGrid(100, 100, 1f, 1f, material, attribs)
+        disposables.register(model)
+        manager.renderableProviders.add(ModelInstance(model))
     }
 
     override fun show() {
@@ -162,7 +180,8 @@ class SimulationScreen : ScreenAdapter() {
         initialiseEcs() // now, we'll bind the car model and related into the ECS
         initialiseTrack() // and finally add the cones and related data
 
-        // TODO create ground plane (preferably, a grid)
+        // misc ininitialisation not covered above
+        bmfont = ASSETS["assets/uiskin/debug.fnt", BitmapFont::class.java]
 
         multiplexer.addProcessor(cameraController)
         Gdx.input.inputProcessor = multiplexer
@@ -170,8 +189,8 @@ class SimulationScreen : ScreenAdapter() {
 
     override fun render(delta: Float) {
         clearScreen(0.0f, 0.0f, 0.0f, 1.0f)
+
         // update
-        // TODO draw bounding box around car
         cameraController.update()
         // TODO clamp camera angle so it doesn't go under the ground
         camera.update()
@@ -180,8 +199,18 @@ class SimulationScreen : ScreenAdapter() {
         wheelScene.modelInstance.calculateTransforms()
         manager.update(delta)
 
+        stage.act(delta) // update UI
+
         // render
-        manager.render()
+        // FIXME fix that shadow-acne like thing when you zoom out
+        manager.render() // render 3D
+
+        stage.draw() // draw UI
+
+        batch.begin()
+        val totalMemory = (Gdx.app.javaHeap + Gdx.app.nativeHeap) / 1048576
+        bmfont.draw(batch, "FPS: ${Gdx.graphics.framesPerSecond}    Memory: $totalMemory MB", 64f, 64f)
+        batch.end()
 
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             Gdx.app.exit()
@@ -191,29 +220,33 @@ class SimulationScreen : ScreenAdapter() {
     override fun resize(width: Int, height: Int) {
         cameraViewport.update(width, height)
         manager.updateViewport(width.toFloat(), height.toFloat())
+        stage.viewport.update(width, height)
     }
 
     override fun dispose() {
         // no main menu, we just quit after this, so we can dispose the assets
         ASSETS.dispose()
         shapeRender.dispose()
-        environmentCubemap.dispose()
-        specularCubemap.dispose()
-        diffuseCubemap.dispose()
-        fxaaEffect.dispose()
+//        fxaaEffect.dispose()
         vfx.dispose()
+        stage.dispose()
+        batch.dispose()
+        disposables.disposeSafely()
     }
 
     /**
-     * Generates a cubemap from the environment/cubemap/ folder of PNGs.
+     * Generates a cubemap from a folder loaded by the AssetManager.
+     * @param path path to folder storing cubemaps WITHOUT trailing slash
+     * @param extension extension WITHOUT dot, e.g. "jpg"
+     * @returns generated cubemap, must be disposed
      */
-    private fun makeCubemap(): Cubemap {
-        val nx = ASSETS["assets/environment/background_miramar/nx.jpg", Texture::class.java]
-        val ny = ASSETS["assets/environment/background_miramar/ny.jpg", Texture::class.java]
-        val nz = ASSETS["assets/environment/background_miramar/nz.jpg", Texture::class.java]
-        val px = ASSETS["assets/environment/background_miramar/px.jpg", Texture::class.java]
-        val py = ASSETS["assets/environment/background_miramar/py.jpg", Texture::class.java]
-        val pz = ASSETS["assets/environment/background_miramar/pz.jpg", Texture::class.java]
+    private fun makeCubemap(path: String, extension: String): Cubemap {
+        val nx = ASSETS["$path/nx.$extension", Texture::class.java]
+        val ny = ASSETS["$path/ny.$extension", Texture::class.java]
+        val nz = ASSETS["$path/nz.$extension", Texture::class.java]
+        val px = ASSETS["$path/px.$extension", Texture::class.java]
+        val py = ASSETS["$path/py.$extension", Texture::class.java]
+        val pz = ASSETS["$path/pz.$extension", Texture::class.java]
         val cube = Cubemap(px.textureData, nx.textureData, py.textureData, ny.textureData, pz.textureData, nz.textureData)
         cube.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         return cube

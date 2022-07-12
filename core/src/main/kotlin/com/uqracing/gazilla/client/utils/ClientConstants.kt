@@ -21,3 +21,8 @@ const val CLIENT_VERSION = "0.0.1"
  * Global shared assets resource
  */
 val ASSETS = AssetManager(LocalFileHandleResolver())
+
+/**
+ * Global client config
+ */
+var CLIENT_CONFIG = ClientConfig()

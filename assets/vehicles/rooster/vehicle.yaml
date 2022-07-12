@@ -11,6 +11,24 @@ metadata:
   author: "UQRacing Formula SAE Team"
   copyright: "Copyright (c) 2022 UQRacing Formula SAE Team. See vehicles/rooster/LICENCE.txt."
 
+# 3D vehicle model options
+model:
+  # Vector3 wheel offsets. Order: front left, front right, back left, back right.
+  wheels:
+    - x: 0.0
+      y: 0.0
+      z: 0.0
+    - x: 0.0
+      y: 0.0
+      z: 0.0
+    - x: 0.0
+      y: 0.0
+      z: 0.0
+    - x: 0.0
+      y: 0.0
+      z: 0.0
+
+# Vehicle dynamics options
 dynamics:
   # Change the below line to the class of the vehicle model being used and configured.
   !com.uqracing.gazilla.server.utils.FssimModelConfig
