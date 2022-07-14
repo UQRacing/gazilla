@@ -13,12 +13,13 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
+import ktx.ashley.mapperFor
 
 /**
  * This system updates the vehicle model for all vehicles in the world
  */
 class PhysicsSystem : IteratingSystem(Family.one(PhysicsComponent::class.java).get()) {
-    private val pm = ComponentMapper.getFor(PhysicsComponent::class.java)
+    private val pm = mapperFor<PhysicsComponent>()
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
         // update vehicle physics

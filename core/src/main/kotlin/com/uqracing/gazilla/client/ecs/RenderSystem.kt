@@ -9,8 +9,7 @@
 package com.uqracing.gazilla.client.ecs
 
 /**
- * This system receives packets over the network, and applies them to the entities in the ECS.
- * TODO maybe this shouldn't actually be a system? since there's no need for it to update every frame
+ * System which handles rendering entities with a SceneComponent
  */
-class DeserialiserSystem {
+class RenderSystem {
 }

@@ -18,6 +18,37 @@ import com.uqracing.gazilla.common.ecs.TransformComponent
 import com.uqracing.gazilla.common.network.NetworkEntity
 
 /**
+ * Different entity types in the simulation
+ */
+enum class EntityType {
+    UNKNOWN,
+    /** The AV body */
+    VEHICLE,
+    /** AV front left wheel */
+    WHEEL_FL,
+    /** AV front right wheel */
+    WHEEL_FR,
+    /** AV back left wheel */
+    WHEEL_BL,
+    /** AV back right wheel */
+    WHEEL_BR,
+    /** Blue cone (left) */
+    CONE_BLUE,
+    /** Yellow cone (right) */
+    CONE_YELLOW,
+}
+
+/**
+ * Where a transform is relative to.
+ */
+enum class TransformParent {
+    /** Transform is relative to the origin (0,0,0). Default. */
+    ORIGIN,
+    /** Transform is relative to the centre of the vehicle's bounding box. Useful for wheels. */
+    VEHICLE
+}
+
+/**
  * Shared client/server Kryo instance
  */
 val KRYO = Kryo(ListReferenceResolver()).apply {
@@ -28,19 +59,6 @@ val KRYO = Kryo(ListReferenceResolver()).apply {
     register(TransformComponent::class.java)
     register(NetworkEntity::class.java)
     register(ArrayList::class.java)
-}
-
-/**
- * Different entity types in the simulation
- */
-enum class EntityType {
-    UNKNOWN,
-    /** The AV */
-    VEHICLE,
-    /** Blue cone (left) */
-    CONE_BLUE,
-    /** Yellow cone (right) */
-    CONE_YELLOW,
 }
 
 /**

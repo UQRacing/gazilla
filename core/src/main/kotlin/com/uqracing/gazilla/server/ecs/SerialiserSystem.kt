@@ -15,6 +15,7 @@ import com.esotericsoftware.kryo.io.Output
 import com.uqracing.gazilla.common.network.NetworkEntity
 import com.uqracing.gazilla.common.ecs.TransformComponent
 import com.uqracing.gazilla.common.utils.KRYO
+import ktx.ashley.mapperFor
 
 /**
  * Ashley system which serialises the relevant parts of each entity for transmission over
@@ -25,7 +26,7 @@ import com.uqracing.gazilla.common.utils.KRYO
 class SerialiserSystem : EntitySystem() {
     private val output = Output(1024)
     private val transportFamily = Family.one(TransportIndicatorComponent::class.java).get()
-    private val tm = ComponentMapper.getFor(TransformComponent::class.java)
+    private val tm = mapperFor<TransformComponent>()
 
     /**
     * Serialised list of entities, since the last call to [update].

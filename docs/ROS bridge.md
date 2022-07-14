@@ -1,4 +1,6 @@
 # ROS bridge
+**Use this: https://wiki.ros.org/rosbridge_suite**
+
 The rest of the car uses ROS Noetic, so it's important Gazilla can support ROS 1 as well. In the
 future, we may suppport ROS 2 as well.
 

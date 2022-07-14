@@ -17,25 +17,37 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g3d.Material
+import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Container
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.ui.Window
+import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.crashinvaders.vfx.VfxManager
-import com.crashinvaders.vfx.effects.FxaaEffect
 import com.esotericsoftware.yamlbeans.YamlReader
+import com.uqracing.gazilla.client.ecs.SceneComponent
 import com.uqracing.gazilla.client.utils.ASSETS
 import com.uqracing.gazilla.common.Track
+import com.uqracing.gazilla.common.ecs.EntityTypeComponent
+import com.uqracing.gazilla.common.ecs.TransformComponent
 import com.uqracing.gazilla.common.utils.COMMON_CONFIG
 import com.uqracing.gazilla.common.utils.CommonConfig
+import com.uqracing.gazilla.common.utils.EntityType
 import ktx.app.clearScreen
+import ktx.ashley.entity
+import ktx.ashley.with
 import ktx.assets.DisposableContainer
 import ktx.assets.disposeSafely
+import ktx.scene2d.*
 import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
@@ -46,6 +58,7 @@ import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.scene.SceneSkybox
 import net.mgsx.gltf.scene3d.utils.IBLBuilder
 import org.tinylog.kotlin.Logger
+import java.awt.SystemColor.window
 
 
 /**
@@ -88,6 +101,27 @@ class SimulationScreen : ScreenAdapter() {
 
     private fun initialiseEcs() {
         Logger.debug("Initialising world")
+        val vehicle = ASSETS["assets/vehicles/rooster/whole_car.glb", SceneAsset::class.java]
+        val wheel = ASSETS["assets/vehicles/rooster/wheel.glb", SceneAsset::class.java]
+
+        // add vehicle
+        engine.entity {
+            with<TransformComponent>()
+            with<EntityTypeComponent> { entityType = EntityType.VEHICLE }
+            with<SceneComponent> { scene = Scene(vehicle.scene) }
+        }
+
+        // add vehicle wheels
+        for (i in 0 until 4) {
+            engine.entity {
+                with<TransformComponent>() // TODO load transform
+                with<EntityTypeComponent> { entityType = EntityType.WHEEL_FL }
+                with<SceneComponent> { scene = Scene(wheel.scene) }
+            }
+        }
+
+        // TODO add the camera to the ECS and have a method to update it to follow the car as it moves?
+        // TODO how do we add scenes to the model graph? we need some type of RenderSystem
     }
 
     private fun initialiseTrack() {
@@ -112,7 +146,7 @@ class SimulationScreen : ScreenAdapter() {
         val wheel = ASSETS["assets/vehicles/rooster/wheel.glb", SceneAsset::class.java]
         val vehicleScene = Scene(vehicle.scene)
         wheelScene = Scene(wheel.scene)
-        wheelScene.modelInstance.transform.translate(0f, 0.2f, 0.4f)
+        wheelScene.modelInstance.transform.translate(0f, 0.2f, 0.4f) // TODO make this relative to vehicle centre?
         wheelScene.modelInstance.calculateTransforms()
 
         manager.addScene(vehicleScene)
@@ -127,7 +161,8 @@ class SimulationScreen : ScreenAdapter() {
         camera.lookAt(carCentre)
         cameraController.zoom(-2f)
         camera.rotateAround(carCentre, Vector3(0f, 0f, 1f), 90f)
-        camera.rotateAround(carCentre, Vector3(0f, 1f, 0f), 180f)
+        camera.rotateAround(carCentre, Vector3(0f, 1f, 0f), 180f) // TODO make this configurable?
+        camera.update()
 
         // setup the sun light
         val light = DirectionalLightEx()
@@ -138,7 +173,7 @@ class SimulationScreen : ScreenAdapter() {
         manager.environment.add(light)
 
         // setup quick IBL (image based lighting)
-        val iblBuilder = IBLBuilder.createCustom(light)
+        val iblBuilder = IBLBuilder.createOutdoor(light)
         val environmentCubemap = makeCubemap("assets/environment/background", "jpg")
         val diffuseCubemap = makeCubemap("assets/environment/irradiance", "png") // iradiance
         val specularCubemap = makeCubemap("assets/environment/radiance", "png") // radiance
@@ -174,15 +209,35 @@ class SimulationScreen : ScreenAdapter() {
         manager.renderableProviders.add(ModelInstance(model))
     }
 
+    private fun initialiseGui() {
+        val window = scene2d.window("Configuration") {
+            label("Testing")
+            slider()
+            pack()
+            pad(10f)
+        }
+        val container = Container(window)
+        container.setFillParent(true)
+        container.right().top()
+//        container.debugAll()
+        container.pad(20f)
+        stage.addActor(container)
+    }
+
     override fun show() {
+        val skin = ASSETS["assets/uiskin/cloud-form-ui.json", Skin::class.java]
+        Scene2DSkin.defaultSkin = skin
+
         loadConfig()
-        initialise3D() // this will initialise the renderer, car model, camera, etc
+        initialise3D() // this will initialise the renderer, car model, grid, camera, etc
         initialiseEcs() // now, we'll bind the car model and related into the ECS
         initialiseTrack() // and finally add the cones and related data
+        initialiseGui() // create GUI windows
 
         // misc ininitialisation not covered above
         bmfont = ASSETS["assets/uiskin/debug.fnt", BitmapFont::class.java]
 
+        multiplexer.addProcessor(stage)
         multiplexer.addProcessor(cameraController)
         Gdx.input.inputProcessor = multiplexer
     }
@@ -213,7 +268,12 @@ class SimulationScreen : ScreenAdapter() {
         batch.end()
 
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+            // quit simulation (TODO only for debug)
             Gdx.app.exit()
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+            // reset camera
+            Logger.debug("Resetting camera")
+            // TODO get a good method for this, need to reset both the controller and the camera
         }
     }
 

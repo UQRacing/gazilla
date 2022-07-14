@@ -1,0 +1,13 @@
+1. DeserialiserSystem:
+    1. Receive network data via ZMQ socket (most likely on another thread) and deserialise using Kryo
+    2. Compute transform graph (since some transforms can depend on other transforms - we need to know car transform
+    before we can align the wheels - luckily should be simple for us, for now)
+    3. Apply deserialised transforms (Vector3 & Quaternion) to each corresponding entity in the world
+2. RenderSystem
+    1. Apply each entity's TransformComponent to the ModelInstance in its SceneComponent
+
+
+TODO
+    - how to make sure each entity on the server corresponds to the correct entity on the client - UUID? negotiation?
+    - maybe we should just serialise & deserialise the entire list of entities? seems slow though and not portable
+    - ditch ECS and do classes & inheritance instead? then send classes over network? could be easier

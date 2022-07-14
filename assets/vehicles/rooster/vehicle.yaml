@@ -32,6 +32,7 @@ model:
 dynamics:
   # Change the below line to the class of the vehicle model being used and configured.
   !com.uqracing.gazilla.server.utils.FssimModelConfig
+
   # Config options for the above vehicle model follow.
 
   # Vehicle mass in kg
