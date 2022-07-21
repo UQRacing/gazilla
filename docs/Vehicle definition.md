@@ -5,6 +5,8 @@ you to rapidly prototype different vehicle and sensor configurations.
 A vehicle is defined by the configuration parameters in the vehicle.yaml file, and some 3D models to 
 render the car on the client side.
 
+Each vehicle lives in its own directory in the assets/vehicles directory.
+
 ## YAML config
 ### Vehicle dynamics
 Gazilla supports pluggable vehicle dynamics. In the vehicle.yaml config, you can define what

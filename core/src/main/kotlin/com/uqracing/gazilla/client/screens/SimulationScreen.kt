@@ -20,6 +20,8 @@ import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController
+import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider
+import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
@@ -42,6 +44,7 @@ import com.uqracing.gazilla.common.ecs.TransformComponent
 import com.uqracing.gazilla.common.utils.COMMON_CONFIG
 import com.uqracing.gazilla.common.utils.CommonConfig
 import com.uqracing.gazilla.common.utils.EntityType
+import com.uqracing.gazilla.common.utils.Utils
 import ktx.app.clearScreen
 import ktx.ashley.entity
 import ktx.ashley.with
@@ -56,7 +59,9 @@ import net.mgsx.gltf.scene3d.scene.Scene
 import net.mgsx.gltf.scene3d.scene.SceneAsset
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.scene.SceneSkybox
+import net.mgsx.gltf.scene3d.shaders.PBRShaderProvider
 import net.mgsx.gltf.scene3d.utils.IBLBuilder
+import net.mgsx.gltf.scene3d.utils.MaterialConverter
 import org.tinylog.kotlin.Logger
 import java.awt.SystemColor.window
 
@@ -77,7 +82,7 @@ class SimulationScreen : ScreenAdapter() {
         scrollFactor = -0.01f
     }
     private val cameraViewport = ExtendViewport(1600f, 900f, camera)
-    private val manager = SceneManager(0)
+    private val manager = SceneManager()
     private val shapeRender = ShapeRenderer()
     private lateinit var wheelScene: Scene
     private val engine = Engine()
@@ -95,7 +100,7 @@ class SimulationScreen : ScreenAdapter() {
 
         // load shared config
         val commonConfigFile = Gdx.files.local("assets/common.yaml")
-        COMMON_CONFIG = YamlReader(commonConfigFile.readString()).read(CommonConfig::class.java)
+        COMMON_CONFIG = Utils.readYaml("assets/common.yaml")
         Logger.debug(COMMON_CONFIG)
     }
 
@@ -125,9 +130,8 @@ class SimulationScreen : ScreenAdapter() {
     }
 
     private fun initialiseTrack() {
-        val trackFile = Gdx.files.local(COMMON_CONFIG.trackFile)
-        Logger.debug("Loading track file $trackFile")
-        val track = YamlReader(trackFile.readString()).read(Track::class.java)
+        Logger.debug("Loading track file ${COMMON_CONFIG.trackFile}")
+        val track = Utils.readYaml<Track>(COMMON_CONFIG.trackFile)
 
         // add cone 3D models based on track data
         for (blueCone in track.cones_left) {
@@ -146,6 +150,8 @@ class SimulationScreen : ScreenAdapter() {
         val wheel = ASSETS["assets/vehicles/rooster/wheel.glb", SceneAsset::class.java]
         val vehicleScene = Scene(vehicle.scene)
         wheelScene = Scene(wheel.scene)
+
+
         wheelScene.modelInstance.transform.translate(0f, 0.2f, 0.4f) // TODO make this relative to vehicle centre?
         wheelScene.modelInstance.calculateTransforms()
 
@@ -291,7 +297,7 @@ class SimulationScreen : ScreenAdapter() {
         vfx.dispose()
         stage.dispose()
         batch.dispose()
-        disposables.disposeSafely()
+        disposables.dispose()
     }
 
     /**

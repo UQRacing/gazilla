@@ -12,21 +12,31 @@ import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.ashley.core.Family
 import com.esotericsoftware.kryo.io.Output
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.uqracing.gazilla.common.network.NetworkEntity
 import com.uqracing.gazilla.common.ecs.TransformComponent
+import com.uqracing.gazilla.common.network.ServerToClientPacket
 import com.uqracing.gazilla.common.utils.KRYO
+import com.uqracing.gazilla.common.utils.SerialisationMethod
 import ktx.ashley.mapperFor
+import org.msgpack.jackson.dataformat.MessagePackFactory
+import java.nio.charset.Charset
+import java.util.HexFormat
 
 /**
  * Ashley system which serialises the relevant parts of each entity for transmission over
- * network.
+ * network. Sends a NetworkPacket.
  *
  * SerialiserSystem **MUST** be the last system to be updated.
  */
-class SerialiserSystem : EntitySystem() {
+class SerialiserSystem() : EntitySystem() {
     private val output = Output(1024)
     private val transportFamily = Family.one(TransportIndicatorComponent::class.java).get()
     private val tm = mapperFor<TransformComponent>()
+    // standard network mapper
+    private val mapper = ObjectMapper(MessagePackFactory())
+    // outputs JSON to debug the network protocol easier
+    private val debugMapper = ObjectMapper()
 
     /**
     * Serialised list of entities, since the last call to [update].
@@ -48,8 +58,16 @@ class SerialiserSystem : EntitySystem() {
 
         // serialise the list of entities and store it in the output buffer
         output.reset()
-        KRYO.writeObject(output, networkEntities)
+        // construct packet, TODO send draw commands
+        val packet = ServerToClientPacket(networkEntities, listOf())
+
+        // serialise packet to byte buffer and store the truncated buffer in the class
+        KRYO.writeObject(output, packet)
         output.flush()
         data = output.toBytes()
+
+        val serialised = mapper.writeValueAsBytes(packet)
+        val hex = HexFormat.ofDelimiter(" ").formatHex(serialised).uppercase()
+        println(hex)
     }
 }

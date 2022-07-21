@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Vector3
 import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryo.util.ListReferenceResolver
 import com.uqracing.gazilla.common.ecs.TransformComponent
+import com.uqracing.gazilla.common.ecs.UUIDComponent
 import com.uqracing.gazilla.common.network.NetworkEntity
 
 /**
@@ -48,17 +49,42 @@ enum class TransformParent {
     VEHICLE
 }
 
+enum class DrawCommandType {
+    UNKNOWN,
+
+    /** Clear all drawn shapes */
+    CLEAR_DISPLAY,
+
+    // 2D shapes (draw to screen directly)
+    DRAW_POINT_2D,
+    DRAW_LINE_2D,
+    DRAW_TEXT_2D,
+    DRAW_RECT,
+
+    // 3D shapes (draw to world)
+    DRAW_POINT_3D,
+    DRAW_LINE_3D,
+    DRAW_TEXT_3D,
+    DRAW_CUBE_WIREFRAME,
+    DRAW_CUBE_FILLED,
+    DRAW_PLANE,
+    DRAW_AXIS,
+    DRAW_SPHERE,
+}
+
+enum class SerialisationMethod {
+    JSON,
+    MESSAGEPACK
+}
+
 /**
- * Shared client/server Kryo instance
+ * Shared client/server Kryo instance. Registration is not required (see inline comment).
  */
 val KRYO = Kryo(ListReferenceResolver()).apply {
-    register(Vector2::class.java)
-    register(Vector3::class.java)
-    register(Quaternion::class.java)
-    register(Matrix4::class.java)
-    register(TransformComponent::class.java)
-    register(NetworkEntity::class.java)
-    register(ArrayList::class.java)
+    // adds a few more bytes per message, and possibly impacts serialisation performance negatively, but:
+    // a) we can gzip/zstd it if we want
+    // b) we end up writing out a huge amount of classes, so it saves quite a lengthy and problematic registration process
+    isRegistrationRequired = false
 }
 
 /**

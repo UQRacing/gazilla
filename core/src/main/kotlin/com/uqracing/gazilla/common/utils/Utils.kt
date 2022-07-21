@@ -10,17 +10,24 @@ package com.uqracing.gazilla.common.utils
 
 import com.badlogic.gdx.Gdx
 import com.esotericsoftware.yamlbeans.YamlReader
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 
 object Utils {
+//    /** Private object used for YAML serialisation */
+//    val yamlMapper = ObjectMapper(YAMLFactory()).apply {
+//        findAndRegisterModules()
+//    }
+
     /**
      * Generic method to read YAML config
      * @param path path to load YAML from
      * @param T type of object to deserialise YAML document to
-     * @param destination variable to store YAML in (TODO will this work with java, we need a pointer?)
+     * @return deserialised YAML
      */
-    private inline fun <reified T> readYaml(path: String, destination: T) {
+    inline fun <reified T> readYaml(path: String): T {
         val configFile = Gdx.files.local(path)
-        // FIXME
-        //destination = YamlReader(configFile.readString()).read(T::class.java)
+        return YamlReader(configFile.readString()).read(T::class.java)
+        //return yamlMapper.readValue(configFile.reader(), T::class.java)
     }
 }

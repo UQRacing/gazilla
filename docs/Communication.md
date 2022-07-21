@@ -7,12 +7,13 @@ sort are supported, see the README for more info.
 ## Ports
 Gazilla client-server uses port 41803, the Gazilla ROS bridge uses port 41802.
 
+## Serialisation format
+See Serialisation.md, we will be changing the format.
+
 ## Gazilla client-server comms
 Gazilla client-server communication is done using Kryo over a ZeroMQ socket.
 This is lightweight and performant, and since both applications are Java, they use Kryo
 which is a Java-internal serialisation framework.
-
-TODO should we use UDP?
 
 ## Gazilla ROS bridge comms
 Communication with the C++ ROS bridge is done using Protocol Buffers over a ZeroMQ socket.

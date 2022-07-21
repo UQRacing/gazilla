@@ -3,10 +3,12 @@ apply plugin: 'application'
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'com.uqracing.gazilla.lwjgl3.Lwjgl3Launcher'
 eclipse.project.name = appName + '-lwjgl3'
-sourceCompatibility = 11
+sourceCompatibility = 17
 
 dependencies {
 	api 'com.esotericsoftware.yamlbeans:yamlbeans:1.15'
+	api 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
+	api 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.3'
     implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
 	implementation "com.badlogicgames.gdx:gdx-bullet-platform:$gdxVersion:natives-desktop"
 	implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"

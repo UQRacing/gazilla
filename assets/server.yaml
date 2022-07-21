@@ -13,6 +13,5 @@ network:
 rosbridge:
   # If the ROS bridge is enabled or not
   enabled: true
-
-  # ROS port
+  # Port the ROS bridge should use
   port: 41802

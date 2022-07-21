@@ -15,9 +15,11 @@ import com.esotericsoftware.yamlbeans.YamlReader
 import com.uqracing.gazilla.common.ecs.EntityTypeComponent
 import com.uqracing.gazilla.common.Track
 import com.uqracing.gazilla.common.ecs.TransformComponent
+import com.uqracing.gazilla.common.ecs.UUIDComponent
 import com.uqracing.gazilla.common.utils.COMMON_CONFIG
 import com.uqracing.gazilla.common.utils.CommonConfig
 import com.uqracing.gazilla.common.utils.EntityType
+import com.uqracing.gazilla.common.utils.Utils
 import com.uqracing.gazilla.server.ecs.PhysicsSystem
 import com.uqracing.gazilla.server.ecs.SerialiserSystem
 import com.uqracing.gazilla.server.ecs.TransportIndicatorComponent
@@ -45,7 +47,10 @@ class GazillaServer(private val vehicleName: String) : ApplicationAdapter() {
             with<TransformComponent>()
             with<EntityTypeComponent>() // FIXME how to set the entity type in here?
             with<TransportIndicatorComponent>()
+            with<UUIDComponent>()
         }
+
+        // TODO add car wheels? are they separate entities, or part of the car?
 
         // add systems
         engine.addSystem(PhysicsSystem())
@@ -56,15 +61,15 @@ class GazillaServer(private val vehicleName: String) : ApplicationAdapter() {
         engine.entity {
             with<TransformComponent>() // TODO set the transform
             with<EntityTypeComponent>() // TODO set the entity type
+            with<UUIDComponent>()
             // we don't transmit cones over the network, since the client gets the same track by
             // reading the common config YAML
         }
     }
 
     private fun initialiseTrack() {
-        val trackFile = Gdx.files.local(COMMON_CONFIG.trackFile)
-        Logger.debug("Loading track file $trackFile")
-        val track = YamlReader(trackFile.readString()).read(Track::class.java)
+        Logger.debug("Loading track file ${COMMON_CONFIG.trackFile}")
+        val track = Utils.readYaml<Track>(COMMON_CONFIG.trackFile)
 
         // add cones based on track data
 //        println("x,y")
@@ -80,19 +85,16 @@ class GazillaServer(private val vehicleName: String) : ApplicationAdapter() {
         Logger.debug("Loading configuration")
         // TODO use Utils.readYaml instead of copy n pasting
 
-        val vehicleConfigFile = Gdx.files.local("assets/vehicles/$vehicleName/vehicle.yaml")
-        VEHICLE_CONFIG = YamlReader(vehicleConfigFile.readString()).read(VehicleConfig::class.java)
+        VEHICLE_CONFIG = Utils.readYaml("assets/vehicles/$vehicleName/vehicle.yaml")
         Logger.debug("${VEHICLE_CONFIG.metadata.name} by ${VEHICLE_CONFIG.metadata.author}")
         Logger.debug("Licence: ${VEHICLE_CONFIG.metadata.copyright}")
 
         // load server config YAML
-        val serverConfigFile = Gdx.files.local("assets/server.yaml")
-        SERVER_CONFIG = YamlReader(serverConfigFile.readString()).read(ServerConfig::class.java)
+        SERVER_CONFIG = Utils.readYaml("assets/server.yaml")
         Logger.debug(SERVER_CONFIG)
 
         // load shared config
-        val commonConfigFile = Gdx.files.local("assets/common.yaml")
-        COMMON_CONFIG = YamlReader(commonConfigFile.readString()).read(CommonConfig::class.java)
+        COMMON_CONFIG =Utils.readYaml("assets/common.yaml")
         Logger.debug(COMMON_CONFIG)
     }
 

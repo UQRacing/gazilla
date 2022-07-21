@@ -12,8 +12,10 @@ import com.badlogic.ashley.core.Component
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.math.Vector3
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.uqracing.gazilla.common.utils.EntityType
 import com.uqracing.gazilla.common.utils.TransformParent
+import java.util.UUID
 
 // Components common to client and server (typically things that are sent across the network)
 
@@ -24,7 +26,7 @@ data class TransformComponent(
     var position: Vector3 = Vector3(),
     var orientation: Quaternion = Quaternion(),
     var parent: TransformParent = TransformParent.ORIGIN,
-    @Transient val transform: Matrix4 = Matrix4(),
+    @Transient @JsonIgnore val transform: Matrix4 = Matrix4(),
 ) : Component, java.io.Serializable {
     /**
      * Calculates the transform matrix in place from the class' position and orientation.
@@ -42,3 +44,11 @@ data class TransformComponent(
 data class EntityTypeComponent(
     var entityType: EntityType = EntityType.UNKNOWN
 ) : Component, java.io.Serializable
+
+/**
+ * Assigns a random unique UUID to each entity in the world so that they can be uniquely identified across the
+ * network.
+ */
+class UUIDComponent : Component, java.io.Serializable {
+    val uuid = UUID.randomUUID()
+}
